@@ -13,7 +13,7 @@ class CommentSection(models.Model):
 
 class Reply(models.Model):
     reply_text = models.TextField(max_length=500)
-    comment = models.ForeignKey(CommentSection ,blank=True, null=True,  on_delete=models.CASCADE)
+    repliedcomment = models.ForeignKey(CommentSection ,blank=True, null=True,  on_delete=models.CASCADE)
 
     def __str__(self):
         return self.reply_text

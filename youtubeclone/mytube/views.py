@@ -54,8 +54,8 @@ class CommentDetail(APIView):
 
 
 class ReplyList(APIView):
-    def get(self,request,comment ):
-        reply = Reply.objects.filter(comment_id=comment)
+    def get(self,request,):
+        reply = Reply.objects.all()
         serializer = ReplySerializer(reply, many=True)
         return Response(serializer.data)
 
@@ -78,7 +78,11 @@ class ReplyDetail(APIView):
         reply = self.get_object(video_id)
         serializer = ReplySerializer(reply)
         return Response(serializer.data)
-
+   
+    def delete(self, request, pk):
+        comment = self.get_object(pk)
+        comment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 

@@ -17,29 +17,29 @@ class CommentAllList(APIView):
         return Response(serializer.data)
 
 class Comments(APIView):
-    def get(self, request):
+   def get(self, request):
         comment = CommentSection.objects.all()
         serializer = CommentSectionSerializer(comment, many=True)
         return Response(serializer.data)
 
-    def post(self, request):
-        serializer = CommentSectionSerializer(data=request.data)
+   def post(self,request):
+        serializer = CommentSectionSerializer(data = request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST) 
 
 
 class CommentDetail(APIView):
 
-    def get_object(self, pk):
+    def get_object(self, video_id):
         try:
-            return CommentSection.objects.get(pk=pk)
+            return CommentSection.objects.get(video_id = video_id)
         except CommentSection.DoesNotExist:
             raise Http404
         
-    def put(self, request, pk):
-        comment = self.get_object(pk)
+    def get(self, request, video_id):
+        comment = CommentSection.objects.filter(video_id = video_id)
         serializer = CommentSectionSerializer(comment, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -48,7 +48,7 @@ class CommentDetail(APIView):
 
     
     def delete(self, request, pk):
-        comment = self.get_object(pk)
+        comment = CommentSection.objects.filter(pk = pk)
         comment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -85,7 +85,47 @@ class ReplyDetail(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class CommentLike(APIView):
+        def get_object(self, pk):
+            try:
+                return CommentSection.objects.get(pk = pk)
+            except CommentSection.DoesNotExist:
+                raise Http404
 
+        def get(self, request, pk):
+            comment = self.get_object(pk)
+            serializer = CommentSectionSerializer(comment, data=request.data)
+            return Response(serializer.data)
+
+        def patch(self, request, pk):
+            comment = self.get_object(pk)
+            data = {"likes": comment.likes + int(1)}
+            serializer = CommentSectionSerializer(comment, data=data, partial = True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class CommentDislike(APIView):
+        def get_object(self, pk):
+            try:
+                return CommentSection.objects.get(pk = pk)
+            except CommentSection.DoesNotExist:
+                raise Http404
+
+        def get(self, request, pk):
+            comment = self.get_object(pk)
+            serializer = CommentSectionSerializer(comment, data=request.data)
+            return Response(serializer.data)
+
+        def patch(self, request, pk):
+            comment = self.get_object(pk)
+            data = {"dislikes": comment.dislikes + int(1)}
+            serializer = CommentSectionSerializer(comment, data=data, partial = True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
